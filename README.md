@@ -90,6 +90,17 @@ Nexora uses a modern full-stack JavaScript architecture.
 
 ---
 
+## 📸 Screenshots
+
+### AI Chat
+![Nexora Chat](screenshots/chats.png)
+
+### Email Assistant
+![Email Assistant](screenshots/email.png)
+
+
+---
+
 ## 🏗️ Application Architecture
 
 Nexora follows a client-server architecture in which the frontend communicates with a backend API, which coordinates authentication, database operations, AI processing, internet search, and email delivery.

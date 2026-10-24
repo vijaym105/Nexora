@@ -3,3 +3,6 @@
 // Read lazily so dotenv has already run.
 export const getFrontendUrl = () =>
     (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/+$/, "");
+
+
+console.log(process.env.FRONTEND_URL)

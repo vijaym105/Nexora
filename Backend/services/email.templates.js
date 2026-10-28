@@ -1,4 +1,4 @@
-const SUPPORT_EMAIL = "vjmalusare10@gmail.com";
+const SUPPORT_EMAIL = "nexora.assistant22@gmail.com";
 
 const escapeHtml = (value = "") =>
     String(value)

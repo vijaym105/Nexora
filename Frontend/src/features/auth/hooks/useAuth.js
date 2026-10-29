@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import {
     register,
+    logout,
     login,
     getMe,
     verifyEmail,
@@ -64,9 +65,16 @@ export function useAuth() {
         }
     }
 
-    // The handlers below are used by the verify-email / forgot-password / reset-password
-    // pages. They keep their own loading/error state, so they just return the API
-    // response and let errors bubble up to the page.
+    async function handleLogout() {
+    try {
+        await logout();
+    } finally {
+        
+        dispatch(setUser(null));
+        dispatch(setError(null));
+    }
+}
+
     const handleVerifyEmail = (token) => verifyEmail(token)
     const handleResendVerification = (email) => resendVerification(email)
     const handleForgotPassword = (email) => forgotPassword(email)
@@ -79,7 +87,8 @@ export function useAuth() {
         handleVerifyEmail,
         handleResendVerification,
         handleForgotPassword,
-        handleResetPassword
+        handleResetPassword,
+        handleLogout
     }
 
 }

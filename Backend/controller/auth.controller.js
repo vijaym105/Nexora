@@ -6,7 +6,7 @@ import { getFrontendUrl } from '../config/urls.js';
 import jwt from 'jsonwebtoken';
 
 const VERIFY_PURPOSE = 'verify-email';
-const RESET_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const RESET_TOKEN_TTL_MS = 15 * 60 * 1000; 
 
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
@@ -268,10 +268,10 @@ export const resetPassword = async (req, res) => {
         })
     }
 
-    user.password = password; // hashed by the model's pre-save hook
+    user.password = password; 
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
-    user.verified = true; // they just proved they own this inbox
+    user.verified = true; 
     await user.save();
 
     res.status(200).json({
@@ -279,3 +279,19 @@ export const resetPassword = async (req, res) => {
         success: true
     })
 }
+
+export const logout = (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        path: "/"
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Logged out successfully"
+    });
+};

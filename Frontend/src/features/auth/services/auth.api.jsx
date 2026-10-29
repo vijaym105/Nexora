@@ -44,3 +44,8 @@ export async function resetPassword({ token, password }) {
     const resp = await api.post("/auth/reset-password", { token, password });
     return resp.data;
 }
+
+export async function logout() {
+    const resp = await api.post("/auth/logout");
+    return resp.data;
+}

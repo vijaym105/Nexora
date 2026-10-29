@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useChat, TEMP_CHAT_ID } from "../hooks/useChat";
+import { useAuth } from "../../auth/hooks/useAuth";
 import EmailDraftCard from "../components/EmailDraftCard";
 import EmailDraftsPanel from "../components/EmailDraftsPanel";
 
@@ -93,6 +94,8 @@ function MessageBody({ text }) {
 
 /* ---------- Dashboard ---------- */
 const Dashboard = ({ onLogout = () => {} }) => {
+  const navigate = useNavigate();
+  const { handleLogout } = useAuth();
   const chat = useChat();
   const authUser = useSelector((state) => state.auth.user);
 
@@ -182,7 +185,18 @@ const Dashboard = ({ onLogout = () => {} }) => {
       send();
     }
   };
-
+const logoutUser = async () => {
+    try {
+        await handleLogout();
+    } catch (error) {
+        console.error(
+            "Logout request failed:",
+            error.response?.data?.message || error.message
+        );
+    } finally {
+        navigate("/login", { replace: true });
+    }
+};
   return (
     <div className="relative flex h-screen w-full overflow-hidden bg-[#06040f] font-sans text-slate-100 antialiased">
       {/* ambient background glow */}
@@ -290,7 +304,8 @@ const Dashboard = ({ onLogout = () => {} }) => {
               <p className="truncate text-sm text-slate-400">{user.email}</p>
             </div>
             <button
-              onClick={onLogout}
+            type="button"
+              onClick={logoutUser}
               aria-label="Log out"
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-slate-400 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
             >

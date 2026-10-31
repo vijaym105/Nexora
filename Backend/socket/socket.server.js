@@ -2,15 +2,11 @@ import {Server} from 'socket.io';
 import { getFrontendUrl } from '../config/urls.js';
 
 let io;
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://nexora-9o65klcof-vijaym105s-projects.vercel.app"
-];
 
 export function initSocket(httpServer){
      io = new Server(httpServer, {
         cors: {
-            origin: allowedOrigins,
+            origin: ["http://localhost:5173", getFrontendUrl()],
             credentials: true,
         }
     })

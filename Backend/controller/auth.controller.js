@@ -6,7 +6,7 @@ import { getFrontendUrl } from '../config/urls.js';
 import jwt from 'jsonwebtoken';
 
 const VERIFY_PURPOSE = 'verify-email';
-const RESET_TOKEN_TTL_MS = 15 * 60 * 1000; 
+const RESET_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
@@ -37,39 +37,71 @@ async function sendVerificationEmail(user) {
 }
 
 
+
 export const register = async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
 
-    const { username, email, password } = req.body
+        const isUserExists = await userModel.findOne({
+            $or: [{ username }, { email }]
+        });
 
-    const isUserExists = await userModel.findOne({
-        $or: [{ username }, { email }]
-    })
-
-    if (isUserExists) {
-        return res.status(400).json({
-            message: `Username or email already exists`,
-            success: false
-        })
-    }
-
-    const user = await userModel.create({
-        username,
-        email,
-        password
-    })
-
-    await sendVerificationEmail(user);
-
-    res.status(201).json({
-        message: 'User created successfully',
-        success: true,
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email
+        if (isUserExists) {
+            return res.status(400).json({
+                message: "Username or email already exists",
+                success: false
+            });
         }
-    })
-}
+
+        const user = await userModel.create({
+            username,
+            email,
+            password
+        });
+
+        let emailSent = false;
+
+        try {
+            await sendVerificationEmail(user);
+            emailSent = true;
+        } catch (emailError) {
+            console.error(
+                "Verification email failed:",
+                emailError.message
+            );
+        }
+
+        return res.status(201).json({
+            message: emailSent
+                ? "Account created. Verification email sent."
+                : "Account created, but verification email could not be sent. Please request a new verification email.",
+            success: true,
+            emailSent,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        console.error("Registration error:", error);
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "Username or email already exists",
+                success: false
+            });
+        }
+
+        return res.status(500).json({
+            message: "Registration failed. Please try again.",
+            success: false
+        });
+    }
+};
+
+
 
 export const login = async (req, res) => {
     const { email, password } = req.body
@@ -118,6 +150,16 @@ export const login = async (req, res) => {
             username: user.username,
             email: user.email,
         }
+    })
+}
+
+export const logout = async (req, res) => {
+    const { maxAge, ...cookieOptions } = authCookieOptions();
+    res.clearCookie('token', cookieOptions);
+
+    res.status(200).json({
+        message: 'User logged out successfully',
+        success: true
     })
 }
 
@@ -268,10 +310,10 @@ export const resetPassword = async (req, res) => {
         })
     }
 
-    user.password = password; 
+    user.password = password; // hashed by the model's pre-save hook
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
-    user.verified = true; 
+    user.verified = true; // they just proved they own this inbox
     await user.save();
 
     res.status(200).json({
@@ -279,19 +321,3 @@ export const resetPassword = async (req, res) => {
         success: true
     })
 }
-
-export const logout = (req, res) => {
-    const isProd = process.env.NODE_ENV === "production";
-
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "none" : "lax",
-        path: "/"
-    });
-
-    return res.status(200).json({
-        success: true,
-        message: "Logged out successfully"
-    });
-};

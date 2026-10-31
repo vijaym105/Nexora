@@ -18,7 +18,6 @@ authRouter.post('/register', validateRegister,register);
  */
 authRouter.post('/login', validateLogin ,login);
 
-authRouter.post("/logout", logout);
 
 /** @route POST api/auth/verify-email
  * @desc Verify a user's email address (token comes from the emailed link)
@@ -48,6 +47,12 @@ authRouter.post('/reset-password', validateResetPassword, resetPassword);
  * @desc Get the authenticated user's information
  * @access Private
  */
+/** @route POST api/auth/logout
+ * @desc Clear the login cookie
+ * @access Public
+ */
+authRouter.post('/logout', logout)
+
 authRouter.get('/getMe', userAuth, getMe)
 
 

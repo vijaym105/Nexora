@@ -11,13 +11,6 @@ export class AllKeysBusyError extends Error {
 
 const statusOf = (err) => err?.status ?? err?.statusCode ?? err?.response?.status ?? err?.cause?.status;
 
-/**
- * Decides what a failed call means:
- *  - "quota"     rate limit / quota used up      -> try the next key, rest this one
- *  - "auth"      key invalid / not allowed       -> try the next key, rest this one longer
- *  - "transient" Google overloaded / network     -> try the next key, rest briefly
- *  - "other"     anything else (bad request...)  -> a different key would not help, rethrow
- */
 export function classifyError(err) {
     const status = statusOf(err);
     const text = `${err?.name ?? ""} ${err?.message ?? ""} ${err?.code ?? ""}`.toLowerCase();

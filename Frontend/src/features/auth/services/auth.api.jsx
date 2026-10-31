@@ -20,6 +20,11 @@ export async function login({ email, password }) {
     return resp.data;
 }
 
+export async function logout() {
+    const resp = await api.post("/auth/logout");
+    return resp.data;
+}
+
 export async function getMe(){
     const resp = await api.get("/auth/getMe");
     return resp.data;
@@ -42,10 +47,5 @@ export async function forgotPassword(email) {
 
 export async function resetPassword({ token, password }) {
     const resp = await api.post("/auth/reset-password", { token, password });
-    return resp.data;
-}
-
-export async function logout() {
-    const resp = await api.post("/auth/logout");
     return resp.data;
 }

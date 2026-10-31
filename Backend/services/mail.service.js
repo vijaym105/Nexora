@@ -1,14 +1,23 @@
+
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+
     auth: {
         type: "OAuth2",
         user: process.env.GOOGLE_USER,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         refreshToken: process.env.REFRESH_TOKEN_SECRET
-    }
+    },
+
+    requireTLS: true,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000
 });
 
 transporter.verify()
@@ -16,11 +25,10 @@ transporter.verify()
         console.log("Nexora email service is ready.");
     })
     .catch((err) => {
-        console.error("Email service error:", err.message);
+        console.error("Email service error:", err);
     });
 
 export const sendEmail = async (to, subject, html, extra = {}) => {
-
     const mailOptions = {
         from: {
             name: "Nexora",
@@ -32,9 +40,9 @@ export const sendEmail = async (to, subject, html, extra = {}) => {
         ...extra
     };
 
-    const res = await transporter.sendMail(mailOptions);
+    const response = await transporter.sendMail(mailOptions);
 
-    console.log("Email sent:", res.messageId);
+    console.log("Email sent:", response.messageId);
 
-    return res;
+    return response;
 };

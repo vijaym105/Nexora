@@ -7,11 +7,9 @@ const App = () => {
   const auth = useAuth()
   const [ sessionChecked, setSessionChecked ] = useState(false)
 
-  // restore the session on page refresh before any route renders,
-  // so a logged-in user isn't bounced to /login
+
   useEffect(() => {
-    auth.handleGetMe().finally(() => setSessionChecked(true))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+       auth.handleGetMe().finally(() => setSessionChecked(true))
   }, [])
 
   if (!sessionChecked) return null

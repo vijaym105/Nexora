@@ -14,7 +14,7 @@ const hasBackupKey = apiKeys.length > 1;
 
 const makeModel = (apiKey) =>
     new ChatGoogleGenerativeAI({
-        model: "gemini-2.5-flash-lite",
+        model: "gemini-3.5-flash-lite",
         apiKey,
         ...(hasBackupKey ? { maxRetries: 0 } : {}),
     });
